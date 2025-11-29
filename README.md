@@ -7,7 +7,9 @@
 
 A multivariate Time Series forecasting application designed to optimize retail inventory levels. It uses **Facebook Prophet** to predict daily demand based on historical sales, weekly seasonality, and external weather factors.
 
-![Dashboard Preview]([INSERT YOUR DASHBOARD SCREENSHOT LINK HERE])
+
+
+|:----------------------------------:|:-----------------------------------:|
 
 ---
 
@@ -77,7 +79,9 @@ streamlit run forecast_app.py
 ---
 
 ## 📸 Dashboard Preview
-Add a screenshot of your dashboard here for visual reference.
+
+| ![Dashboard Preview](picture%201.png) | ![Inventory Simulator](picture%202.png) |
+|:------------------------------------:|:-------------------------------------:|
 
 ---
 
