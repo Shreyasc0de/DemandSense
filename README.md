@@ -9,8 +9,6 @@ A multivariate Time Series forecasting application designed to optimize retail i
 
 
 
-|:----------------------------------:|:-----------------------------------:|
-
 ---
 
 ## 💼 Business Value
