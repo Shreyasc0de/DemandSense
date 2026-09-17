@@ -1,0 +1,13 @@
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.DS_Store
+models/
+
+# The transactions workbook is 45 MB and is fetched from UCI by the reader.
+# The weather CSV is small and openly licensed, so it IS committed: it makes
+# the repo reproducible without a second download.
+data/online_retail_II.xlsx
+_to_delete/

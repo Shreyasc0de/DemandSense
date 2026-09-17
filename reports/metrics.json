@@ -1,0 +1,163 @@
+{
+  "source": {
+    "transactions": "UCI Online Retail II (CC BY 4.0)",
+    "weather": "Open-Meteo historical reanalysis, London (CC BY 4.0)"
+  },
+  "horizon_days": 28,
+  "initial_days": 365,
+  "step_days": 28,
+  "prophet_available": true,
+  "cleaning": {
+    "rows_raw": 1067371,
+    "rows_cancellations": 19494,
+    "rows_non_positive_quantity": 3457,
+    "rows_missing_price": 2750,
+    "rows_non_product_codes": 4589,
+    "rows_kept": 1037081,
+    "non_product_codes_seen": [
+      "ADJUST",
+      "ADJUST2",
+      "AMAZONFEE",
+      "B",
+      "BANK CHARGES",
+      "C2",
+      "CRUK",
+      "D",
+      "DOT",
+      "M",
+      "PADS",
+      "POST",
+      "S",
+      "TEST001",
+      "TEST002"
+    ]
+  },
+  "series": {
+    "n_days": 739,
+    "first_day": "2009-12-01",
+    "last_day": "2011-12-09",
+    "n_zero_days": 135,
+    "zero_day_share": 0.18267929634641408,
+    "n_saturdays": 105,
+    "n_saturdays_with_sales": 1,
+    "mean_daily_units": 15429.951285520974,
+    "mean_units_on_trading_days": 18878.69867549669,
+    "sd_daily_units": 13412.123715048232,
+    "max_daily_units": 125513.0,
+    "busiest_day": "2010-09-27",
+    "mean_temp_c": 10.206495263870092,
+    "min_temp_c": -6.4,
+    "max_temp_c": 22.9,
+    "corr_temp_units": -0.032294958048584975,
+    "corr_temp_units_trading_days": -0.08416855286656773,
+    "dow_mean_units": {
+      "0": 19561.638095238097,
+      "1": 20462.584905660377,
+      "2": 19353.06603773585,
+      "3": 22397.48113207547,
+      "4": 16003.349056603774,
+      "5": 48.75238095238095,
+      "6": 10025.67619047619
+    }
+  },
+  "engines": {
+    "prophet_weather": {
+      "mae": 5981.502256483527,
+      "rmse": 7908.95518293444,
+      "mape": 41.16520476582338,
+      "coverage_80": 0.9010989010989012,
+      "mean_interval_width": 26229.77279387151,
+      "n_folds": 13,
+      "sd_mae_across_folds": 1806.4093660087108
+    },
+    "prophet_calendar_only": {
+      "mae": 5983.081893804347,
+      "rmse": 7852.784354360972,
+      "mape": 41.88176951614919,
+      "coverage_80": 0.903846153846154,
+      "mean_interval_width": 26254.587649164314,
+      "n_folds": 13,
+      "sd_mae_across_folds": 1769.990522032209
+    },
+    "gbdt_weather": {
+      "mae": 4917.135979892465,
+      "rmse": 7320.944038288168,
+      "mape": 37.70649105201152,
+      "coverage_80": 0.8846153846153846,
+      "mean_interval_width": 22354.83286590222,
+      "n_folds": 13,
+      "sd_mae_across_folds": 2590.468297273517
+    },
+    "gbdt_calendar_only": {
+      "mae": 5225.718592484757,
+      "rmse": 7753.469190148904,
+      "mape": 38.96795667448778,
+      "coverage_80": 0.879120879120879,
+      "mean_interval_width": 22751.306422047604,
+      "n_folds": 13,
+      "sd_mae_across_folds": 2346.552440575878
+    },
+    "seasonal_naive_7d": {
+      "mae": 6479.21153846154,
+      "rmse": 9343.644340393606,
+      "mape": 49.58787296890523,
+      "coverage_80": 0.9340659340659339,
+      "mean_interval_width": 39413.43332847151,
+      "n_folds": 13,
+      "sd_mae_across_folds": 3068.3446126332233
+    },
+    "last_value": {
+      "mae": 10226.06868131868,
+      "rmse": 12674.308108977737,
+      "mape": 71.95657364274966,
+      "coverage_80": 0.901098901098901,
+      "mean_interval_width": 42025.923853839355,
+      "n_folds": 13,
+      "sd_mae_across_folds": 3696.2569172664325
+    },
+    "mean": {
+      "mae": 8919.934403840274,
+      "rmse": 11306.589228505034,
+      "mape": 53.04805961186305,
+      "coverage_80": 0.9203296703296703,
+      "mean_interval_width": 34969.334014334134,
+      "n_folds": 13,
+      "sd_mae_across_folds": 3391.2946321085224
+    }
+  },
+  "best_by_mae": "gbdt_weather",
+  "best_baseline": "seasonal_naive_7d",
+  "best_vs_baseline_mae_pct": 24.109037794126152,
+  "paired_comparisons": {
+    "prophet_weather__vs__prophet_calendar_only": {
+      "metric": "mae",
+      "n_folds": 13,
+      "mean_reduction": 1.5796373208182,
+      "se": 42.145449858009776,
+      "ci_low": -81.02544440088097,
+      "ci_high": 84.18471904251736,
+      "folds_won": 6,
+      "distinguishable": false
+    },
+    "gbdt_weather__vs__gbdt_calendar_only": {
+      "metric": "mae",
+      "n_folds": 13,
+      "mean_reduction": 308.5826125922917,
+      "se": 299.2209926251624,
+      "ci_low": -277.8905329530266,
+      "ci_high": 895.0557581376099,
+      "folds_won": 5,
+      "distinguishable": false
+    },
+    "gbdt_weather__vs__seasonal_naive_7d": {
+      "metric": "mae",
+      "n_folds": 13,
+      "mean_reduction": 1562.0755585690729,
+      "se": 445.1089148343789,
+      "ci_low": 689.6620854936903,
+      "ci_high": 2434.4890316444553,
+      "folds_won": 11,
+      "distinguishable": true
+    }
+  }
+}
