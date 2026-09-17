@@ -15,6 +15,7 @@ import joblib
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -26,6 +27,7 @@ from demandsense.data import (  # noqa: E402
 )
 
 INK, ACCENT, WARN = "#2B2B2B", "#0B6E4F", "#C1443C"
+MUTED, HAIRLINE = "#5C5C5C", "#D8D8D8"
 
 
 def build_engines() -> list[tuple[str, object]]:
@@ -66,30 +68,87 @@ def plot_backtest(df, engine, horizon, initial, step, path: Path) -> None:
 
 
 def plot_coverage(summaries: dict[str, dict], path: Path) -> None:
+    """Coverage against the nominal 80%, one series so one colour.
+
+    Every method over-covers, so there is no status distinction to encode and
+    colouring by distance-from-nominal would paint all seven bars the same
+    alarm colour. Bar length carries the magnitude; the two extremes are
+    labelled because the README quotes that range, and the table carries the
+    rest.
+    """
     names = sorted(summaries, key=lambda n: summaries[n]["coverage_80"])
     cover = [summaries[n]["coverage_80"] for n in names]
-    colours = [ACCENT if abs(c - 0.80) <= 0.05 else WARN for c in cover]
-    fig, ax = plt.subplots(figsize=(8.5, 0.46 * len(names) + 1.9))
-    ax.barh(names, cover, color=colours, height=0.62)
-    ax.axvline(0.80, color=INK, ls="--", lw=1.3)
-    ax.annotate("nominal 80%", xy=(0.80, -0.85), xytext=(0.815, -0.85),
-                color=INK, fontsize=9, va="center")
-    ax.set_xlim(0, 1)
+
+    fig, ax = plt.subplots(figsize=(8.5, 0.46 * len(names) + 2.1))
+    ax.barh(names, cover, color=ACCENT, height=0.6)
+
+    # Dashed only because this is a genuine threshold, not a gridline.
+    ax.axvline(0.80, color=INK, ls="--", lw=1.2, zorder=3)
+    # Anchored in data x and axes-fraction y, so the label cannot fall outside
+    # the axes the way a hardcoded categorical y coordinate did.
+    # Sits in the margin ABOVE the plot area: inside the axes it collided with
+    # the top bar and its value label.
+    ax.annotate(
+        "nominal 80%", xy=(0.80, 1.0), xycoords=("data", "axes fraction"),
+        xytext=(5, 7), textcoords="offset points",
+        ha="left", va="bottom", fontsize=9, color=INK, annotation_clip=False,
+    )
+
+    lowest, highest = int(np.argmin(cover)), int(np.argmax(cover))
+    for i in (lowest, highest):
+        ax.annotate(f"{cover[i]:.3f}", xy=(cover[i], i), xytext=(6, 0),
+                    textcoords="offset points", va="center", ha="left",
+                    fontsize=9, color=MUTED)
+
+    ax.set_xlim(0, 1.06)
+    ax.set_xticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
     ax.set_xlabel("Share of held-out days inside the 80% interval")
+    ax.tick_params(length=3, colors=MUTED)
     ax.spines[["top", "right"]].set_visible(False)
+    for side in ("left", "bottom"):
+        ax.spines[side].set(linewidth=0.8, color=HAIRLINE)
     fig.tight_layout()
     fig.savefig(path, dpi=150)
     plt.close(fig)
 
 
+def _dow_mean(facts: dict, day: int) -> float:
+    """Day-of-week mean, tolerating the string keys a JSON round trip produces."""
+    table = facts["dow_mean_units"]
+    if day in table:
+        return float(table[day])
+    return float(table[str(day)])
+
+
 def plot_weekly_shape(facts: dict, path: Path) -> None:
+    """Mean units by weekday. The finding is Saturday, so Saturday is labelled.
+
+    Saturday's mean is 49 units, which is 0.2% of a weekday and draws as a bar
+    roughly a fifth of a pixel tall. Without a label it reads as a rendering
+    fault rather than as the point of the figure. Thursday is labelled too, as
+    the peak, and the axis carries the rest.
+    """
     labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-    means = [facts["dow_mean_units"][d] / 1e3 for d in range(7)]
-    colours = [WARN if m == 0 else ACCENT for m in means]
-    fig, ax = plt.subplots(figsize=(7, 3.2))
-    ax.bar(labels, means, color=colours, width=0.62)
+    means = [_dow_mean(facts, d) for d in range(7)]
+
+    fig, ax = plt.subplots(figsize=(7.2, 3.4))
+    ax.set_axisbelow(True)
+    ax.grid(axis="y", color=HAIRLINE, lw=0.7, ls="-")
+    ax.bar(labels, [m / 1e3 for m in means], color=ACCENT, width=0.6, zorder=2)
+
+    peak = int(np.argmax(means))
+    quiet = int(np.argmin(means))
+    for i, note in ((peak, f"{means[peak]:,.0f}"), (quiet, f"{means[quiet]:,.0f} units")):
+        ax.annotate(note, xy=(i, means[i] / 1e3), xytext=(0, 6),
+                    textcoords="offset points", ha="center", va="bottom",
+                    fontsize=9, color=MUTED)
+
+    ax.set_ylim(0, max(means) / 1e3 * 1.18)
     ax.set_ylabel("Mean units per day (thousands)")
+    ax.tick_params(length=3, colors=MUTED)
     ax.spines[["top", "right"]].set_visible(False)
+    for side in ("left", "bottom"):
+        ax.spines[side].set(linewidth=0.8, color=HAIRLINE)
     fig.tight_layout()
     fig.savefig(path, dpi=150)
     plt.close(fig)
